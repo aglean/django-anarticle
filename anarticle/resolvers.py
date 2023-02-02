@@ -6,10 +6,10 @@ from ariadne_relay import NodeObjectType
 from django.db.models import Q
 from django.utils import timezone
 
-from .models import Article, Tag
+from .models import Article, Tag, Category
 
 
-article = NodeObjectType('Article')
+article = NodeObjectType('AnArticle')
 
 
 @article.instance_resolver
@@ -22,7 +22,7 @@ def resolve_article_paragraphs(obj, *_):
     return obj.paragraph_set.all()
 
 
-@article.field('tags')
+@article.connection('tags')
 def resolve_article_tags(obj, *_):
     return obj.tags.all()
 
