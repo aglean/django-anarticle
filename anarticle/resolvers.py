@@ -1,90 +1,108 @@
 """
 Copyright (c) 2014-present, aglean Inc.
 """
-from ariadne import convert_kwargs_to_snake_case
+import operator
+from functools import reduce
+
+from ariadne import ObjectType, convert_kwargs_to_snake_case
 from ariadne_relay import NodeObjectType
 from django.db.models import Q
+from django.db.models.query import QuerySet
 from django.utils import timezone
 
 from .models import Article, Tag, Category
 
 
-article = NodeObjectType('AnArticle')
+anarticle_tag = NodeObjectType('AnArticleTag')
 
 
-@article.instance_resolver
-def resolve_article_instance(id, *_):
-    return Article.objects.get(id=id)
-
-
-@article.field('paragraphs')
-def resolve_article_paragraphs(obj, *_):
-    return obj.paragraph_set.all()
-
-
-@article.connection('tags')
-def resolve_article_tags(obj, *_):
-    return obj.tags.all()
-
-
-@convert_kwargs_to_snake_case
-def resolve_articles(*_,
-                     is_published=True,
-                     published_at=timezone.now(),
-                     exclude_tags=None,
-                     include_tags=None):
-    queryset = Article.objects.filter(is_published__exact=is_published,
-                                      published_at__lt=published_at)
-
-    if exclude_tags is not None:
-        values = [t.strip() for t in exclude_tags.split(',')]
-        queryset = queryset.exclude(tags__name__in=values)
-
-    if include_tags is not None:
-        values = [t.strip() for t in include_tags.split(',')]
-        queryset = queryset.filter(tags__name__in=values)
-
-    return queryset
-
-
-article_tag = NodeObjectType('ArticleTag')
-
-
-@article_tag.instance_resolver
-def resolve_article_tag_instance(id, *_):
+@anarticle_tag.instance_resolver
+def resolve_anarticle_tag_instance(id, *_):
     return Tag.objects.get(id=id)
 
 
-@article_tag.connection('articles')
-def resolve_article_tag_articles(obj, *_):
-    return obj.article_set.filter(is_published=True)
+@anarticle_tag.connection('articles')
+def resolve_anarticle_tag_articles(obj, info, **kwargs):
+    return resolve_anarticles(obj.article_set.all(), info, kwargs)
 
 
 @convert_kwargs_to_snake_case
-def resolve_article_tags(*_,
-                         name=None,
-                         exclude_tags=None,
-                         include_tags=None):
-    queryset = Tag.objects.all()
+def reoslve_anarticle_tags(obj, info, **kwargs):
+    name = kwargs.get('name', '')
 
-    if name is not None:
-        queryset = queryset.filter(Q(name__exact=name),
-                                   Q(name__icontains=name),
-                                   Q(name__istartswith=name))
+    queryset = []
+    filters = []
 
-    if exclude_tags is not None:
-        values = [t.strip() for t in exclude_tags.split(',')]
-        queryset = queryset.exclude(name__in=values)
+    if name:
+        filters.append(Q(name__icontains=name))
 
-    if include_tags is not None:
-        values = [t.strip() for t in include_tags.split(',')]
-        queryset = queryset.filter(name__in=values)
+    if filters:
+        queryset = queryset.filter(filters) if obj.isinstance(obj, QuerySet) \
+                else Tag.objects.filter(filters)
+    else:
+        queryset = obj if obj.isinstance(obj, QuerySet) \
+                else Tag.objects.all()
 
     return queryset
 
 
-def resolve_article(*_, slug):
-    return Article.objects.get(slug=slug)
+anarticle_category = NodeObjectType('AnArticleCategory')
 
-types = [article,
-         article_tag]
+
+@anarticle_category.instance_resolver
+def resolve_anarticle_category_instance(id, *_):
+    return Category.objects.get(id=id)
+
+
+@anarticle_category.connection('tags')
+def resolve_anarticle_category_tags(obj, info, **kwargs):
+    return resolve_anarticle_tags(obj.tags.all(), info, kwargs)
+
+
+anarticle = NodeObjectType('AnArticle')
+anarticle_paragraph = ObjectType('AnArticleParagraph')
+
+
+@anarticle.instance_resolver
+def resolve_anarticle_instance(id, *_):
+    return Article.objects.get(id=id)
+
+
+@anarticle.field('paragraphs')
+def resolve_anarticle_paragraphs(obj, *_):
+    return obj.paragraph_set.all()
+
+
+@anarticle.connection('tags')
+def resolve_anarticle_tags(obj, info, **kwargs):
+    return resolve_anarticle_tags(obj.tags.all(), info, kwargs)
+
+
+@convert_kwargs_to_snake_case
+def resolve_anarticles(obj, info, **kwargs):
+    is_published = kwargs.get('is_published', False)
+    published_at = kwargs.get('published_at', timezone.now())
+    tags = kwargs.get('tags', '')
+
+    queryset = []
+    filters = [
+        Q(is_published=is_published),
+        Q(published_at__lt=published_at)
+    ]
+
+    if tags:
+        values = [t.strip() for t in tags.split(',')]
+        filters.append(Q(tags__name__in=values))
+
+    if filters:
+        queryset = queryset.filter(reduce(operator.and_, filters)) \
+                if obj.isinstance(obj, QuerySet) \
+                else Article.objects.filter(reduce(operator.and_, filters))
+    else:
+        queryset = obj if obj.isinstance(obj, QuerySet) \
+                else Article.objects.all()
+
+    return queryset
+
+
+types = [anarticle, anarticle_paragraph,  anarticle_tag, anarticle_category]

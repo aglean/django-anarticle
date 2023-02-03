@@ -9,8 +9,8 @@ type AnArticle implements Node {
     createdAt: DateTime!
     updatedAt: DateTime
     author: User
-    tags: AnArticleTagConnection
     paragraphs: [AnArticleParagraph]
+    tags: AnArticleTagConnection
 }
 
 type AnArticleConnection {
