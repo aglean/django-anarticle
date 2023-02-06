@@ -1,7 +1,7 @@
 # Copyright (c) 2014-present, aglean Inc.
 
 [build-system]
-requires = ["setuptools>=66.1.1", "wheel"]
+requires = ["setuptools>=66.1.1", "setuptools_scm[toml]>=7.1.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -30,7 +30,7 @@ dependencies = [
     "ariadne >= 0.16.0",
     "ariadne-relay >= 0.1.0a8",
 ]
-version = "0.0.1"
+dynamic = ["version"]
 
 [project.optional-dependencies]
 dev = [
@@ -54,6 +54,9 @@ license-files = ["LICENSE"]
 
 [tool.setuptools.packages]
 find = {}
+
+[tool.setuptools_scm]
+write_to = "anarticle/_version.py"
 
 [tool.pytest.ini_options]
 addopts = [
