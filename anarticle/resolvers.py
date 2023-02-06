@@ -22,12 +22,12 @@ def resolve_anarticle_tag_instance(id, *_):
 
 
 @anarticle_tag.connection('articles')
-def resolve_anarticle_tag_articles(obj, info, **kwargs):
+def resolve_anarticle_tag_article_connection(obj, info, **kwargs):
     return resolve_anarticles(obj.article_set.all(), info, kwargs)
 
 
 @convert_kwargs_to_snake_case
-def reoslve_anarticle_tags(obj, info, **kwargs):
+def resolve_anarticle_tags(obj, info, **kwargs):
     name = kwargs.get('name', '')
 
     queryset = []
@@ -37,10 +37,11 @@ def reoslve_anarticle_tags(obj, info, **kwargs):
         filters.append(Q(name__icontains=name))
 
     if filters:
-        queryset = queryset.filter(filters) if obj.isinstance(obj, QuerySet) \
-                else Tag.objects.filter(filters)
+        queryset = queryset.filter(reduce(operator.and_, filters)) \
+                if isinstance(obj, QuerySet) \
+                else Tag.objects.filter(reduce(operator.and_, filters))
     else:
-        queryset = obj if obj.isinstance(obj, QuerySet) \
+        queryset = obj if isinstance(obj, QuerySet) \
                 else Tag.objects.all()
 
     return queryset
@@ -74,7 +75,7 @@ def resolve_anarticle_paragraphs(obj, *_):
 
 
 @anarticle.connection('tags')
-def resolve_anarticle_tags(obj, info, **kwargs):
+def resolve_anarticle_tag_connection(obj, info, **kwargs):
     return resolve_anarticle_tags(obj.tags.all(), info, kwargs)
 
 
@@ -94,13 +95,9 @@ def resolve_anarticles(obj, info, **kwargs):
         values = [t.strip() for t in tags.split(',')]
         filters.append(Q(tags__name__in=values))
 
-    if filters:
-        queryset = queryset.filter(reduce(operator.and_, filters)) \
-                if obj.isinstance(obj, QuerySet) \
-                else Article.objects.filter(reduce(operator.and_, filters))
-    else:
-        queryset = obj if obj.isinstance(obj, QuerySet) \
-                else Article.objects.all()
+    queryset = queryset.filter(reduce(operator.and_, filters)) \
+        if isinstance(obj, QuerySet) \
+        else Article.objects.filter(reduce(operator.and_, filters))
 
     return queryset
 
