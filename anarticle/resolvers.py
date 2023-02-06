@@ -60,6 +60,31 @@ def resolve_anarticle_category_tags(obj, info, **kwargs):
     return resolve_anarticle_tags(obj.tags.all(), info, kwargs)
 
 
+@convert_kwargs_to_snake_case
+def resolve_anarticle_categories(obj, info, **kwargs):
+    name = kwargs.get('name', '')
+    description = kwargs.get('description', '')
+
+    queryset = []
+    filters = []
+
+    if name:
+        filters.append(Q(name__icontains=name))
+
+    if description:
+        filters.append(Q(description__icontains=description))
+
+    if filters:
+        queryset = queryset.filter(reduce(operator.and_, filters)) \
+                if isinstance(obj, QuerySet) \
+                else Category.objects.filter(reduce(operator.and_, filters))
+    else:
+        queryset = obj if isinstance(obj, QuerySet) \
+                else Category.objects.all()
+
+    return queryset
+
+
 anarticle = NodeObjectType('AnArticle')
 anarticle_paragraph = ObjectType('AnArticleParagraph')
 
@@ -102,4 +127,4 @@ def resolve_anarticles(obj, info, **kwargs):
     return queryset
 
 
-types = [anarticle, anarticle_paragraph,  anarticle_tag, anarticle_category]
+types = [anarticle, anarticle_paragraph, anarticle_tag, anarticle_category]
