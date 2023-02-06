@@ -106,9 +106,10 @@ def resolve_anarticle_tag_connection(obj, info, **kwargs):
 
 @convert_kwargs_to_snake_case
 def resolve_anarticles(obj, info, **kwargs):
-    is_published = kwargs.get('is_published', False)
+    is_published = kwargs.get('is_published', True)
     published_at = kwargs.get('published_at', timezone.now())
     tags = kwargs.get('tags', '')
+    title = kwargs.get('title', '')
 
     queryset = []
     filters = [
@@ -119,6 +120,9 @@ def resolve_anarticles(obj, info, **kwargs):
     if tags:
         values = [t.strip() for t in tags.split(',')]
         filters.append(Q(tags__name__in=values))
+
+    if title:
+        filters.append(Q(title__icontains=title))
 
     queryset = queryset.filter(reduce(operator.and_, filters)) \
         if isinstance(obj, QuerySet) \
