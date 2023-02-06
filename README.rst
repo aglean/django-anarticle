@@ -24,7 +24,8 @@ Use predefined mixins to construct the admin class.
 * CategoryAdminMixin
 * ArticleAdminMixin
 
-.. code-block::
+.. code:: python
+
     from anarticle.admin.mixins import TagAdminMixin
 
     class TagAdmin(TagAdminMixin, ModelAdmin):
@@ -36,13 +37,13 @@ Ariadne types and resolvers
 
 Integrate predefined types and resolvers to scheme.
 
-** resolvers **
+**resolvers**
 
 * resolve_anarticles
 * resolve_anarticle_tags
 * resolve_anarticle_categories
 
-** types **
+**types**
 
 * anarticle
 * anarticle_paragraph
