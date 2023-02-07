@@ -29,6 +29,7 @@ dependencies = [
     "django >= 4.0",
     "ariadne >= 0.16.0",
     "ariadne-relay >= 0.1.0a8",
+    "pillow >= 9.4.0",
 ]
 dynamic = ["version"]
 

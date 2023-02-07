@@ -12,7 +12,8 @@ Requirements
 * Python 3.11+
 * django 4.0+
 * ariadne 0.16.0+
-* ariadne-relay 0.1.0a8
+* ariadne-relay 0.1.0a8+
+* pillow 9.4.0+
 
 -------------------
 Django admin mixins
@@ -26,8 +27,13 @@ Use predefined mixins to construct the admin class.
 
 .. code:: python
 
+    from django.contrib import admin
+
+    from anarticle.models import Tag
     from anarticle.admin.mixins import TagAdminMixin
 
+
+    @admin.register(Tag)
     class TagAdmin(TagAdminMixin, ModelAdmin):
         ...
 
