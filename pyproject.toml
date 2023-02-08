@@ -57,7 +57,8 @@ license-files = ["LICENSE"]
 find = {}
 
 [tool.setuptools_scm]
-write_to = "anarticle/_version.py"
+# write_to = "anarticle/_version.py"
+local_scheme = "no-local-version"
 
 [tool.pytest.ini_options]
 addopts = [
