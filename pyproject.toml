@@ -43,7 +43,6 @@ graphql = [
 dev = [
     "python-lsp-server[rope,pyflakes,mccabe,pycodestyle,autopep8]",
     "pylsp-rope",
-    "autoimport",
 ]
 test = [
     "pytest",
