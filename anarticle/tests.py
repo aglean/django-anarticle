@@ -1,6 +1,5 @@
 """
-Copyright (c) 2014-present, AGLean Inc.
-All rights reserved.
+Copyright (c) 2014-present, aglean Inc.
 """
 from django.test import TestCase
 

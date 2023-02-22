@@ -1,7 +1,6 @@
 """
 Copyright (c) 2014-present, aglean Inc.
 """
-import pytest
 from django.conf import settings
 
 
