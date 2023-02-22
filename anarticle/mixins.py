@@ -3,15 +3,17 @@ Copyright (c) 2014-present, aglean Inc.
 """
 from django.contrib import admin
 
-from anarticle.models import Paragraph
+from .models import Paragraph
 
 
 class TagAdminMixin():
+    ordering = ('name',)
     list_display = ('id', 'name', 'image', 'image_url', 'article_count')
     search_fields = ('name',)
 
 
 class CategoryAdminMixin():
+    ordering = ('name',)
     list_display = ('id', 'name', 'description', 'image', 'image_url',
                     'tag_count')
     list_filter = ('tags',)
@@ -20,10 +22,12 @@ class CategoryAdminMixin():
 
 
 class ParagraphInline(admin.StackedInline):
+    ordering = ('id',)
     model = Paragraph
 
 
 class ArticleAdminMixin():
+    ordering = ('-created_at',)
     list_display = ('id', 'title', 'author', 'image', 'image_url',
                     'is_published', 'published_at', 'updated_at', 'created_at')
     list_filter = ('tags', 'tags__category')
