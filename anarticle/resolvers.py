@@ -37,7 +37,7 @@ def resolve_anarticle_tags(obj, info, **kwargs):
         filters.append(Q(name__icontains=name))
 
     if filters:
-        queryset = queryset.filter(reduce(operator.and_, filters)) \
+        queryset = obj.filter(reduce(operator.and_, filters)) \
                 if isinstance(obj, QuerySet) \
                 else Tag.objects.filter(reduce(operator.and_, filters))
     else:
@@ -75,7 +75,7 @@ def resolve_anarticle_categories(obj, info, **kwargs):
         filters.append(Q(description__icontains=description))
 
     if filters:
-        queryset = queryset.filter(reduce(operator.and_, filters)) \
+        queryset = obj.filter(reduce(operator.and_, filters)) \
                 if isinstance(obj, QuerySet) \
                 else Category.objects.filter(reduce(operator.and_, filters))
     else:
@@ -106,16 +106,18 @@ def resolve_anarticle_tag_connection(obj, info, **kwargs):
 
 @convert_kwargs_to_snake_case
 def resolve_anarticles(obj, info, **kwargs):
-    is_published = kwargs.get('is_published', True)
+    is_published = kwargs.get('is_published', None)
     published_at = kwargs.get('published_at', timezone.now())
     tags = kwargs.get('tags', '')
     title = kwargs.get('title', '')
 
     queryset = []
     filters = [
-        Q(is_published=is_published),
         Q(published_at__lt=published_at)
     ]
+
+    if is_published is not None:
+        filters.append(Q(is_published=is_published))
 
     if tags:
         values = [t.strip() for t in tags.split(',')]
@@ -124,7 +126,7 @@ def resolve_anarticles(obj, info, **kwargs):
     if title:
         filters.append(Q(title__icontains=title))
 
-    queryset = queryset.filter(reduce(operator.and_, filters)) \
+    queryset = obj.filter(reduce(operator.and_, filters)) \
         if isinstance(obj, QuerySet) \
         else Article.objects.filter(reduce(operator.and_, filters))
 
