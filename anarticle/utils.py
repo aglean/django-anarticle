@@ -17,11 +17,11 @@ def image_path(instance, filename):
         f'{fixed_filename}{PurePath(filename).suffix}'
     )
 
-    if getattr(settings, 'PUBLICATION_USE_TOKEN_FILENAME', False):
-        return PurePath('anarticle').joinpath(
+    if getattr(settings, 'ANARTICLE_USE_TOKEN_FILENAME', False):
+        return PurePath(instance._meta.app_label).joinpath(
                 f'{token_urlsafe()}{PurePath(filename).suffix}')
     else:
-        return PurePath('anarticle').joinpath(cleaned_filename)
+        return PurePath(instance._meta.app_label).joinpath(cleaned_filename)
 
 
 def image_url(instance):
