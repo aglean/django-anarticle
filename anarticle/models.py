@@ -7,28 +7,21 @@ from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.text import slugify
-from django.utils.translation import gettext_lazy as _
 
 from .utils import image_path, image_url
 
 
 class Tag(models.Model):
     # detail
-    name = models.CharField(_('Name'), max_length=255, unique=True)
+    name = models.CharField(max_length=255)
     image = models.ImageField(
-        _('Cover image'),
         upload_to=image_path,
-        help_text=_(
+        help_text=(
             'Upload file should under size limitation, '
             'with png, jpg or jpeg file extensions.'
         ),
         blank=True
     )
-
-    class Meta:
-        ordering = ['name']
-        verbose_name = _('Tag')
-        verbose_name_plural = _('Tags')
 
     def __str__(self):
         return self.name
@@ -44,25 +37,19 @@ class Tag(models.Model):
 
 class Category(models.Model):
     # relationship
-    tags = models.ManyToManyField(Tag, verbose_name=_('Tags'))
+    tags = models.ManyToManyField(Tag)
 
     # detail
-    name = models.CharField(_('Name'), max_length=255, unique=True)
-    description = models.TextField(_('Description'), blank=True)
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
     image = models.ImageField(
-        _('Cover image'),
         upload_to=image_path,
-        help_text=_(
+        help_text=(
             'Upload file should under size limitation, '
             'with png, jpg or jpeg file extensions.'
         ),
         blank=True
     )
-
-    class Meta:
-        ordering = ['name']
-        verbose_name = _('Category')
-        verbose_name_plural = _('Categories')
 
     def __str__(self):
         return self.name
@@ -78,28 +65,25 @@ class Category(models.Model):
 
 class Article(models.Model):
     # relationship
-    tags = models.ManyToManyField(Tag, verbose_name=_('Tags'))
+    tags = models.ManyToManyField(Tag)
     author = models.ForeignKey(settings.AUTH_USER_MODEL,
                                on_delete=models.SET_NULL,
-                               null=True,
-                               verbose_name=_('Author'))
+                               null=True)
 
     # detail
-    title = models.CharField(_('Title'), max_length=255)
+    title = models.CharField(max_length=255)
     slug = models.SlugField(
-        _('Slug'),
-        help_text=_(
+        help_text=(
             'Characters combine with numbers, underscores or hyphens.'
             'Ex: today1_news-headline'
         ),
         allow_unicode=True,
         blank=True
     )
-    summary = models.TextField(_('Summary'))
+    summary = models.TextField()
     image = models.ImageField(
-        _('Cover image'),
         upload_to=image_path,
-        help_text=_(
+        help_text=(
             'Upload file should under size limitation, '
             'with png, jpg or jpeg file extensions.'
         ),
@@ -108,26 +92,15 @@ class Article(models.Model):
 
     # flag
     is_published = models.BooleanField(
-        _('Publish'),
-        help_text=_('Designates whether the item is published on the site.'),
+        'Published',
+        help_text=('Designates whether the item is published on the site.'),
         default=True
     )
 
     # datetime
-    published_at = models.DateTimeField(_('Published at'),
-                                        blank=True,
-                                        null=True)
-    created_at = models.DateTimeField(_('Created at'),
-                                      auto_now=False,
-                                      auto_now_add=True)
-    updated_at = models.DateTimeField(_('Updated at'),
-                                      auto_now=True,
-                                      auto_now_add=False)
-
-    class Meta:
-        ordering = ['-created_at']
-        verbose_name = _('Article')
-        verbose_name_plural = _('Articles')
+    published_at = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now=False, auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True, auto_now_add=False)
 
     def __str__(self):
         return self.title
@@ -149,32 +122,23 @@ def post_article_process(sender, instance, **kwargs):
 
 class Paragraph(models.Model):
     # relationship
-    article = models.ForeignKey(Article,
-                                on_delete=models.CASCADE,
-                                verbose_name=_('Article'))
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
 
     # detail
-    content = models.TextField(_('Content'), blank=True)
+    content = models.TextField(blank=True)
     image = models.ImageField(
-        _('Image'),
         upload_to=image_path,
-        help_text=_(
+        help_text=(
             'Upload file should under size limitation, '
             'with png, jpg or jpeg file extensions.'
         ),
         blank=True
     )
     image_text = models.CharField(
-        _('Image description'),
         max_length=255,
-        help_text=_('Descripe the image content'),
+        help_text='Descripe the image content',
         blank=True
     )
-
-    class Meta:
-        ordering = ['id']
-        verbose_name = _('Paragraph')
-        verbose_name_plural = _('Paragraphs')
 
     @property
     def image_url(self):
