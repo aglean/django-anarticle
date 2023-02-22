@@ -9,7 +9,7 @@ Support for Ariadne graphQL with pre-defined types and basic resolvers.
 Requirements
 ------------
 
-* Python 3.11+
+* Python 3.10+
 * django 4.0+
 * pillow 9.4.0+
 
@@ -32,6 +32,7 @@ Use predefined mixins to construct the admin class.
 * ArticleAdminMixin
 
 .. code:: python
+
     from django.contrib import admin
 
     from anarticle.models import Tag
