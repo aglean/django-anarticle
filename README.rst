@@ -55,24 +55,68 @@ Requirements
 * ariadne 0.16.0+
 * ariadne-relay 0.1.0a8+
 
-**resolvers**
+**scheme**
 
-* resolve_anarticles
-* resolve_anarticle_tags
-* resolve_anarticle_categories
+.. code:: python
+
+   from anarticle.graphqls import anarticle_schema
+
+
+* anarticle/graphqls/article.graphql
+* anarticle/graphqls/tag.graphql
+* anarticle/graphqls/category.graphql
 
 **types**
+
+.. code:: python
+
+   from anarticle.graphqls import anarticle_bindables
+
 
 * anarticle
 * anarticle_paragraph
 * anarticle_tag
 * anarticle_category
 
-**graphqls**
+**resolvers**
 
-* anarticle/graphqls/article.graphql
-* anarticle/graphqls/tag.graphql
-* anarticle/graphqls/category.graphql
+Async version
+
+.. code:: python
+
+   from anarticle.graphqls import resolve_anarticle_tag_instance, \
+           resolve_anarticle_tag_articles_connection, resolve_anarticle_tags
+
+   anarticle_tag.set_instance_resolver(resolve_anarticle_tag_instance)
+   anarticle_tag.set_connection('articles', resolve_anarticle_tag_articles_connection)
+
+   query.set_field('tags', resolve_anarticle_tags)
+
+
+* resolve_anarticle_tag_instance,
+* resolve_anarticle_tag_articles_connection,
+* resolve_anarticle_category_instance,
+* resolve_anarticle_category_tags_connection,
+* resolve_anarticle_instance,
+* resolve_anarticle_paragraphs,
+* resolve_anarticle_tags_connection,
+* resolve_anarticle_tags,
+* resolve_anarticle_categories,
+* resolve_anarticles,
+
+
+Sync version
+
+* resolve_anarticle_tag_instance_sync,
+* resolve_anarticle_tag_articles_connection_sync,
+* resolve_anarticle_category_instance_sync,
+* resolve_anarticle_category_tags_connection_sync,
+* resolve_anarticle_instance_sync,
+* resolve_anarticle_paragraphs_sync,
+* resolve_anarticle_tags_connection_sync,
+* resolve_anarticle_tags_sync,
+* resolve_anarticle_categories_sync,
+* resolve_anarticles_sync,
 
 -------
 License
